@@ -87,7 +87,7 @@ properties = {
   frA_ScaleFeedrate: false,            // Will feedrated be scaled
   frB_MaxCutSpeedXY: 1300,              // Max speed for cut movements X & Y (mm/min)
   frC_MaxCutSpeedZ: 180,               // Max speed for cut movements Z (mm/min)
-  frD_MaxCutSpeedXYZ: 1000,            // Max feedrate after scaling
+  frD_MaxCutSpeedXYZ: 1300,            // Max feedrate after scaling
 
   mapD_RestoreFirstRapids: true,      // Map first G01 --> G00 
   mapE_RestoreRapids: true,           // Map G01 --> G00 for SafeTravelsAboveZ 
