@@ -71,7 +71,7 @@ var eCoolant = {
 // user-defined properties
 properties = {
   job0_SelectedFirmware : fw,            // Firmware to use in special cases
-  job1_SetOriginOnStart: true,           // Set current position as 0,0,0 on start (G92)
+  job1_SetOriginOnStart: false,           // Set current position as 0,0,0 on start (G92)
   job2_ManualSpindlePowerControl: true,  // Spindle motor is controlled by manual switch 
   job3_CommentLevel: eComment.Info,      // The level of comments included 
   job4_UseArcs: true,                    // Produce G2/G3 for arcs
@@ -83,27 +83,27 @@ properties = {
 
   fr0_TravelSpeedXY: 2500,             // High speed for travel movements X & Y (mm/min)
   fr1_TravelSpeedZ: 300,               // High speed for travel movements Z (mm/min)
-  fr2_EnforceFeedrate: true,          // Add feedrate to each movement line
+  fr2_EnforceFeedrate: true,           // Add feedrate to each movement line
   frA_ScaleFeedrate: false,            // Will feedrated be scaled
-  frB_MaxCutSpeedXY: 900,              // Max speed for cut movements X & Y (mm/min)
+  frB_MaxCutSpeedXY: 1300,              // Max speed for cut movements X & Y (mm/min)
   frC_MaxCutSpeedZ: 180,               // Max speed for cut movements Z (mm/min)
   frD_MaxCutSpeedXYZ: 1000,            // Max feedrate after scaling
 
-  mapD_RestoreFirstRapids: false,      // Map first G01 --> G00 
-  mapE_RestoreRapids: false,           // Map G01 --> G00 for SafeTravelsAboveZ 
+  mapD_RestoreFirstRapids: true,      // Map first G01 --> G00 
+  mapE_RestoreRapids: true,           // Map G01 --> G00 for SafeTravelsAboveZ 
   mapF_SafeZ: "Retract:15",            // G01 mapped to G00 if Z is >= jobSafeZRapid
   mapG_AllowRapidZ: false,             // Allow G01 --> G00 for vertical retracts and Z descents above safe
 
   toolChange0_Enabled: false,          // Enable tool change code (bultin tool change requires LCD display)
   toolChange1_X: 0,                    // X position for builtin tool change
   toolChange2_Y: 0,                    // Y position for builtin tool change
-  toolChange3_Z: 40,                   // Z position for builtin tool change
+  toolChange3_Z: 20,                   // Z position for builtin tool change
   toolChange4_DisableZStepper: false,  // disable Z stepper when change a tool
 
   probe1_OnStart: false,               // Execute probe gcode to align tool
-  probe2_OnToolChange: false,          // Z probe after tool change
-  probe3_Thickness: 0.8,               // plate thickness
-  probe4_UseHomeZ: true,               // use G28 or G38 for probing 
+  probe2_OnToolChange: true,           // Z probe after tool change
+  probe3_Thickness: 0.5,               // plate thickness
+  probe4_UseHomeZ: false,              // use G28 or G38 for probing 
   probe5_G38Target: -10,               // probing up to pos 
   probe6_G38Speed: 30,                 // probing with speed 
 
@@ -300,7 +300,8 @@ propertyDefinitions = {
     type: "integer", default_mm: 106, default_in: 106,
     values: [
       { title: "Fan - M106 S{PWM}/M107", id: 106 },
-      { title: "Spindle - M3 O{PWM}/M5", id: 3 },
+      { title: "Spindle - M3 O{PWM}/M5", id: 31 },
+      { title: "Spindle - M3 S{PWM}/M5", id: 32 },
       { title: "Pin - M42 P{pin} S{PWM}", id: 42 },
     ]
   },
@@ -806,12 +807,15 @@ function laserOn(power) {
       case 106:
         writeBlock(mFormat.format(106), sFormat.format(laser_pwm));
         break;
-      case 3:
+      case 31:
         if (fw == eFirmware.REPRAP) {
           writeBlock(mFormat.format(3), sFormat.format(laser_pwm));
         } else {
           writeBlock(mFormat.format(3), oFormat.format(laser_pwm));
         }
+        break;
+      case 32:
+        writeBlock(mFormat.format(3), sFormat.format(laser_pwm));
         break;
       case 42:
         writeBlock(mFormat.format(42), pFormat.format(properties.cutter5_MarlinPin), sFormat.format(laser_pwm));
@@ -832,7 +836,8 @@ function laserOff() {
       case 106:
         writeBlock(mFormat.format(107));
         break;
-      case 3:
+      case 31:
+      case 32:
         writeBlock(mFormat.format(5));
         break;
       case 42:
